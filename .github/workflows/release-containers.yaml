@@ -20,6 +20,9 @@ jobs:
           - node
           - node-slim
           - node-alpine
+        architecture:
+          - linux/amd64
+          - linux/arm64
 
     steps:
       - name: Checkout repository
@@ -58,7 +61,14 @@ jobs:
       - name: Download Gleam archive from GitHub release
         run: |
           VERSION=${{ steps.versions.outputs.v_version }}
-          URL=https://github.com/${{ github.repository }}/releases/download/$VERSION/gleam-$VERSION-x86_64-unknown-linux-musl.tar.gz
+
+          # Choose the url based on the architecture
+          if [ "${{ matrix.architecture }}" = "linux/amd64" ]; then
+            URL=https://github.com/${{ github.repository }}/releases/download/$VERSION/gleam-$VERSION-x86_64-unknown-linux-musl.tar.gz
+          else
+            URL=https://github.com/${{ github.repository }}/releases/download/$VERSION/gleam-$VERSION-aarch64-unknown-linux-musl.tar.gz
+          fi
+
           echo Downloading $URL
           curl -Lo gleam.tar.gz $URL
 
@@ -69,7 +79,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.architecture }}
           file: containers/${{ matrix.base-image }}.dockerfile
           push: true
           tags: ${{ steps.versions.outputs.container_tag }}
