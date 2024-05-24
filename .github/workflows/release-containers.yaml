@@ -59,11 +59,11 @@ jobs:
         run: |
           VERSION=${{ steps.versions.outputs.v_version }}
 
-          AMD_URL=https://github.com/${{ github.repository }}/releases/download/$VERSION/gleam-$VERSION-x86_64-unknown-linux-musl.tar.gz
-          ARM_URL=https://github.com/${{ github.repository }}/releases/download/$VERSION/gleam-$VERSION-aarch64-unknown-linux-musl.tar.gz
+          AMD_URL=https://github.com/${{ github.repository }}/releases/download/v0.0.4/gleam-v0.0.4-x86_64-unknown-linux-musl.tar.gz
+          ARM_URL=https://github.com/${{ github.repository }}/releases/download/v0.0.4/gleam-v0.0.4-aarch64-unknown-linux-musl.tar.gz
 
           echo Downloading amd $AMD_URL
-          curl -Lo gleam-amd.tar.gz $AMDURL
+          curl -Lo gleam-amd.tar.gz $AMD_URL
 
           echo Downloading arm $ARM_URL
           curl -Lo gleam-arm.tar.gz $ARM_URL
@@ -71,7 +71,10 @@ jobs:
       - name: Unpack Gleam binary from archive
         run: |
           tar xf gleam-amd.tar.gz
+          mv gleam gleam-amd64
+
           tar xf gleam-arm.tar.gz
+          mv gleam gleam-arm64
 
       - name: Build and push
         uses: docker/build-push-action@v5
